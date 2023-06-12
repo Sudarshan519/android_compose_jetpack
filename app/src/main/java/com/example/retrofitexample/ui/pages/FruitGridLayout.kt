@@ -31,13 +31,7 @@ fun FruitGrid(navController:NavController){
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center
 ) {
-//    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Center)
-//    {
-//Text(text = "Fruits Calories and Sugar", fontSize = 20.dp)
-//    }
-//        Column() {
-//            Text(text = "Fruits Calories and Sugar", fontSize = 20.dp)
-//        }
+
     LazyVerticalGrid(columns = GridCells.Fixed(3)){
         item {
            (1..100) .map {FruitDataGridItem( data = "dfkslfjklsd",navController)  }

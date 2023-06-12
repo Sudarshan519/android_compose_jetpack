@@ -9,11 +9,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.retrofitexample.AudioBook
 import com.example.retrofitexample.AudioBookList
 import com.example.retrofitexample.BaseResponse
+import com.example.retrofitexample.GenereData
 import com.example.retrofitexample.MomoClient
 import com.example.retrofitexample.Post
 import com.example.retrofitexample.RetrofitClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.http.GET
+import retrofit2.http.Url
 
 class PostViewModel : ViewModel() {
     private val momoService = MomoClient.apiService
@@ -24,9 +27,13 @@ val isloading= mutableStateOf(false)
     val posts: LiveData<List<Post>> get() = postslist
     val items = mutableStateListOf<Post>()
     var audioBookList= mutableStateListOf<AudioBookList>()
+    var audioBooks= mutableStateListOf<AudioBook>()
     val audiobookvalue = mutableStateOf<BaseResponse>(BaseResponse())
     private val baseResponse = MutableLiveData<BaseResponse>()
     val audioBook:LiveData<BaseResponse> get()=baseResponse
+    private val generell = MutableLiveData<GenereData>()
+    val generesDetail:LiveData<GenereData> get()=generell
+
 fun getHomePage(){
     text.value="loading"
 isloading.value=(true)
@@ -54,6 +61,7 @@ audiobookvalue.value=response
     fun getPosts() {
 
         text.value="loading"
+        isloading.value=true
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 items.clear()
@@ -63,7 +71,7 @@ audiobookvalue.value=response
                     postslist.postValue(posts.data)
                 text.value=posts.data.toString()
                 items.addAll(posts.data)
-
+                isloading.value=false
 
 
             } catch (e: Exception) {
@@ -71,4 +79,17 @@ audiobookvalue.value=response
             }
         }
     }
+
+  fun  getApi(url:String){
+ viewModelScope.launch (Dispatchers.IO){
+     isloading.value=true
+     val response=  momoService.getApi(url)
+     response.data?.items?.let {it-> audioBooks   .addAll(it) }
+     isloading.value=false
+
+//generell.value=response
+//     Log.d("TAG", "api: "+response)
+ }
+
+  }
 }
