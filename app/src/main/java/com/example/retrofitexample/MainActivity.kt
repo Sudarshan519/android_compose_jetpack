@@ -33,6 +33,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
@@ -226,28 +227,33 @@ else if (page=="SETTINGS")
 }}
 @Composable
 fun CircularAvatar(imageUrl: String, size: Dp, alpha: Double =1.0,round:Boolean=false ) {
-    if(round)
-    Image(
-        painter = rememberImagePainter(imageUrl),
-        contentDescription = null,
-        modifier = Modifier
-            .size(size).clip(RoundedCornerShape(10.dp)).background(Color.Red)
-//            .clip(CircleShape)
-    , contentScale = ContentScale.FillBounds,
-
-        alpha = alpha.toFloat()
-    )
-    else
+    if(round) {
         Image(
             painter = rememberImagePainter(imageUrl),
             contentDescription = null,
             modifier = Modifier
-                .size(size).clip(RoundedCornerShape(10.dp)).background(Color.Gray)
+                .size(size)
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.Red)
 //            .clip(CircleShape)
             , contentScale = ContentScale.FillBounds,
 
             alpha = alpha.toFloat()
         )
+    }
+    else {
+        Image(
+            painter = rememberImagePainter(imageUrl),
+            contentDescription = null,
+            modifier = Modifier
+                .size(size)
+                .background(Color.Gray)
+//            .clip(CircleShape)
+            , contentScale = ContentScale.FillBounds,
+
+            alpha = alpha.toFloat()
+        )
+    }
 }
 
 
