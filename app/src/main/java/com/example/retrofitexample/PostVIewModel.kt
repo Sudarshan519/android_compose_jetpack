@@ -19,6 +19,7 @@ import retrofit2.http.GET
 import retrofit2.http.Url
 
 class PostViewModel : ViewModel() {
+
     public  val activePage= mutableStateOf<String>("HOME");
     private val momoService = MomoClient.apiService
 val isloading= mutableStateOf(false)
@@ -63,6 +64,7 @@ audiobookvalue.value=response
 
         text.value="loading"
         isloading.value=true
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 items.clear()
@@ -81,9 +83,10 @@ audiobookvalue.value=response
         }
     }
 
-  fun  getApi(url:String){
+  fun  getApi(url:String){ isloading.value=true
+      audioBooks.clear()
  viewModelScope.launch (Dispatchers.IO){
-     isloading.value=true
+
      val response=  momoService.getApi(url)
      response.data?.items?.let {it-> audioBooks   .addAll(it) }
      isloading.value=false

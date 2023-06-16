@@ -30,7 +30,6 @@ import com.example.retrofitexample.AudioBook
 import com.example.retrofitexample.CircularAvatar
 import com.example.retrofitexample.MainContent
 import com.example.retrofitexample.Post
-import com.example.retrofitexample.R
 import com.example.retrofitexample.ui.pages.AlbumDetailPage
 
 @Composable

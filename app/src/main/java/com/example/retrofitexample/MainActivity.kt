@@ -2,7 +2,6 @@ package com.example.retrofitexample
 
 import PostViewModel
 import android.annotation.SuppressLint
-import android.graphics.Paint.Align
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -28,7 +27,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -44,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -51,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.example.retrofitexample.ui.pages.GridItem
 import com.example.retrofitexample.ui.routes.NavigatePage
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -137,13 +137,11 @@ else if (page=="SETTINGS")
 
 
     @SuppressLint("SuspiciousIndentation")
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun Greeting(
         viewModel: PostViewModel,
         onClick: () -> Unit,
         name: String,
-//        modifier: Modifier = Modifier.align(Alignment.BottomCenter)
     ) {
 
         var isRefreshing by remember { mutableStateOf(false) }
@@ -227,15 +225,29 @@ else if (page=="SETTINGS")
 
 }}
 @Composable
-fun CircularAvatar(imageUrl: String, size: Dp) {
+fun CircularAvatar(imageUrl: String, size: Dp, alpha: Double =1.0,round:Boolean=false ) {
+    if(round)
     Image(
         painter = rememberImagePainter(imageUrl),
         contentDescription = null,
         modifier = Modifier
-            .size(size)
+            .size(size).clip(RoundedCornerShape(10.dp)).background(Color.Red)
 //            .clip(CircleShape)
-    , contentScale = ContentScale.FillBounds
+    , contentScale = ContentScale.FillBounds,
+
+        alpha = alpha.toFloat()
     )
+    else
+        Image(
+            painter = rememberImagePainter(imageUrl),
+            contentDescription = null,
+            modifier = Modifier
+                .size(size).clip(RoundedCornerShape(10.dp)).background(Color.Gray)
+//            .clip(CircleShape)
+            , contentScale = ContentScale.FillBounds,
+
+            alpha = alpha.toFloat()
+        )
 }
 
 
@@ -413,60 +425,78 @@ fun AudioBookContents(
                                         Column(
 
                                         ) {
-                                            Row(
-                                                modifier=Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.SpaceBetween
-                                            ) {
-
-                                                GroupTitle(navController ,it1)
-                                            }
-
-                                            Row(
-                                                modifier = Modifier
-                                                    .horizontalScroll(rememberScrollState())
-                                                    .fillMaxSize()
-                                            ) {
-                                                it1.items?.forEach { a->
-                                                    Column(
-                                                        modifier = Modifier
-                                                            .size(300.dp, 200.dp)
-                                                            .clickable {
-//                                                           a.redirect_link?.let { it2 ->
-//                                                               postViewModel.getApi(
-//                                                                   it2
-//                                                               )
-//                                                           };
-                                                                val url = URLEncoder.encode(
-                                                                    "${a.redirect_link}",
-                                                                    StandardCharsets.UTF_8.toString()
-                                                                )
-
-                                                                navController.navigate("details/$url")
-//                                                           a.redirect_link?.let { a->  navController.navigate("grid_detail/$a" ) }
-//                                                           a.redirect_link?.let { it2 ->
-//                                                               navController.navigate("details/{$it2}" )
-//                                                           }
-                                                                Log.d(
-                                                                    "TAG",
-                                                                    "MainContent:${a.redirect_link.toString()} "
-                                                                )
-                                                            }
-                                                    ) {
-                                                        a.logo?.let { it2 -> CircularAvatar(imageUrl= it2, size = 100.dp) }
-                                                        a.background?.let { it2 -> CircularAvatar(imageUrl= it2, size = 100.dp) }
-                                                        a.name?.let { it2 -> Text(text=it2)
-                                                            a.contentProvider?.let { b-> b.name?.let { it3 -> Text(text= it3) } }
-                                                        }
-                                                        a.title?.let { it2 -> Text(text= it2, ) }
-                                                        a.description?.let { it2 -> Text(text= it2, ) }
-                                                    }
-                                                }
-                                            }
-
                                         }
 
+  Row(  modifier=Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween){
+      GroupTitle(navController ,it1)
 
-                                }
+        }
+                                    Row(
+                                        modifier = Modifier
+                                            .horizontalScroll(rememberScrollState())
+                                            .fillMaxSize()
+                                    ){
+                                        it1.items?.forEach { a->
+                                            GridItem(audioBook = a,)
+                                        }
+                                    }
+                                        }}
+//                                            Row(
+//                                                modifier=Modifier.fillMaxWidth(),
+//                                                horizontalArrangement = Arrangement.SpaceBetween
+//                                            ) {
+//
+//                                                GroupTitle(navController ,it1)
+//                                            }
+//
+//                                            Row(
+//                                                modifier = Modifier
+//                                                    .horizontalScroll(rememberScrollState())
+//                                                    .fillMaxSize()
+//                                            ) {
+//                                                it1.items?.forEach { a->
+//                                                    Column(
+//                                                        modifier = Modifier
+//                                                            .size(300.dp, 200.dp)
+//                                                            .clickable {
+////                                                           a.redirect_link?.let { it2 ->
+////                                                               postViewModel.getApi(
+////                                                                   it2
+////                                                               )
+////                                                           };
+//                                                                val url = URLEncoder.encode(
+//                                                                    "${a.redirect_link}",
+//                                                                    StandardCharsets.UTF_8.toString()
+//                                                                )
+//
+//                                                                navController.navigate("details/$url")
+////                                                           a.redirect_link?.let { a->  navController.navigate("grid_detail/$a" ) }
+////                                                           a.redirect_link?.let { it2 ->
+////                                                               navController.navigate("details/{$it2}" )
+////                                                           }
+//                                                                Log.d(
+//                                                                    "TAG",
+//                                                                    "MainContent:${a.redirect_link.toString()} "
+//                                                                )
+//                                                            }
+//                                                    ) {
+//                                                        a.logo?.let { it2 -> CircularAvatar(imageUrl = it2, size = 100.dp) }
+//                                                        a.background?.let { it2 -> CircularAvatar(
+//                                                            imageUrl = it2, size = 100.dp) }
+//                                                        a.name?.let { it2 -> Text(text=it2)
+//                                                            a.contentProvider?.let { b-> b.name?.let { it3 -> Text(text= it3) } }
+//                                                        }
+//                                                        a.title?.let { it2 -> Text(text= it2, ) }
+//                                                        a.description?.let { it2 -> Text(text= it2, ) }
+//                                                    }
+//                                                }
+//                                            }
+//
+//                                        }
+//
+
+//                                }
                             }
                         }
                     }
@@ -477,6 +507,4 @@ fun AudioBookContents(
 
     }
 
-
-}
 
