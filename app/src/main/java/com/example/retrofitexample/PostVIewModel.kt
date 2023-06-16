@@ -19,6 +19,7 @@ import retrofit2.http.GET
 import retrofit2.http.Url
 
 class PostViewModel : ViewModel() {
+    public  val activePage= mutableStateOf<String>("HOME");
     private val momoService = MomoClient.apiService
 val isloading= mutableStateOf(false)
     private val apiService = RetrofitClient.apiService

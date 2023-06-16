@@ -4,16 +4,14 @@ import PostViewModel
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,10 +26,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.retrofitexample.AudioBook
 import com.example.retrofitexample.CircularAvatar
 import com.example.retrofitexample.MainContent
 import com.example.retrofitexample.Post
 import com.example.retrofitexample.R
+import com.example.retrofitexample.ui.pages.AlbumDetailPage
 
 @Composable
 fun ListPost(post: Post, onClick: () -> Unit) {
@@ -81,6 +81,9 @@ fun NavigatePage( ) {
                 composable("test"){
                     TestPage(navController = navHostController,viewModel)
                 }
+                composable("album-detail"){
+                    AlbumDetailPage(navController = navHostController,viewModel)
+                }
                 composable("grid_detail/link{item}",
                     arguments = listOf(
                         navArgument("item"){
@@ -104,6 +107,13 @@ fun NavigatePage( ) {
                 }
 
                 }
+                composable("view_all/{link}", arguments = listOf(navArgument(name= "link"){   type = NavType.StringType})){
+                        navBackStackEntry ->  navBackStackEntry?.arguments?.getString("link")?.let {
+                        link->
+                    ViewAll(navController = navHostController,viewModel=viewModel, link = link,)
+                }
+
+                }
         composable("detailPage/{item}",     arguments= listOf (navArgument(name = "item"){
             type= NavType.StringType
         })){
@@ -117,7 +127,50 @@ navBackStackEntry ->  navBackStackEntry?.arguments?.getString("item")
     }
 //}
 
+@Composable 
+fun ViewAll(navController: NavHostController,viewModel:PostViewModel, link :String,){
+    val item=viewModel.audioBookList.firstOrNull { item->item.slug==link }
+    Column(
 
+
+    ) {
+        if (item != null) {
+            item.name?.let { Text(text = it) }
+        }
+        LazyVerticalGrid(columns = GridCells.Fixed(2), content ={
+            if (item != null) {
+                item.items?.let { items(it.size){
+                    i-> Card(
+                    modifier = Modifier.padding(4.dp)
+                    ) {
+                    AudioBookComponent(navController = navController, audioBook = item.items[i])
+                }
+
+                } }
+            }
+        } )
+
+
+
+    }
+
+}
+
+@Composable
+fun AudioBookComponent(navController: NavHostController,audioBook: AudioBook){
+
+   Column(
+      modifier= Modifier.size(300.dp ),
+       horizontalAlignment = Alignment.CenterHorizontally
+   ) {
+       CircularAvatar(imageUrl = "${audioBook.logo}", size = 100.dp)
+       audioBook.genre?.let { Text(text = it, modifier = Modifier.align(Alignment.CenterHorizontally)) }
+       audioBook.title?.let { Text(text = it, modifier = Modifier.align(Alignment.CenterHorizontally)) }
+
+       audioBook.genre?.let { Text(text ="Genere: "+ it,modifier = Modifier.align(Alignment.CenterHorizontally)) }
+
+   }
+}
 @Composable
 fun GenreRoute(navController: NavHostController){}
 
@@ -169,9 +222,10 @@ fun DetailPage(navController: NavHostController,viewModel: PostViewModel,link:St
 
     }
 
- if (   viewModel.isloading.value)
-    CircularProgressIndicator()
-    if( !viewModel.isloading.value)
+ if (   viewModel.isloading.value) {
+     CircularProgressIndicator()
+ }
+ else
 Column(
 ) {
 //    viewModel.audioBooks.forEach{
@@ -180,8 +234,10 @@ Column(
 //    }
     viewModel.audioBooks.forEach {i->
         Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {i.logo?.let { CircularAvatar(imageUrl = it, size =200.dp ) }
+            modifier = Modifier
+                .size(200.dp, 200.dp)
+                .fillMaxWidth()
+        ) {i.logo?.let { CircularAvatar(imageUrl = it, size =100.dp ) }
             i.name?.let { Text(text = it) }
             Text(text = i.description.toString())
 

@@ -2,6 +2,7 @@ package com.example.retrofitexample
 
 import PostViewModel
 import android.annotation.SuppressLint
+import android.graphics.Paint.Align
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -20,23 +21,30 @@ import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.ViewModelProvider
 import com.example.retrofitexample.ui.theme.RetrofitExampleTheme
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Scaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -80,186 +88,53 @@ class MainActivity : ComponentActivity() {
         postViewModel.getHomePage()
     }
 }
+@Composable
+fun Body() {
 
+}
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun MainContent(navController: NavController, postViewModel:PostViewModel) {
     var ctx = LocalContext.current.applicationContext
-
+val page=postViewModel.activePage.value
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
 
+    Scaffold(
+        bottomBar  = {
+            BottonNav(navController,postViewModel)
+        }
 
+    ) { contentPadding ->
+        // Screen content
+        Box(modifier = Modifier
+            .padding(contentPadding)
 
-    if ((!postViewModel.isloading.value))
-        SwipeRefresh(state = swipeRefreshState, onRefresh = { postViewModel.getHomePage() }) {
+            .fillMaxSize()) {
+            Column() {
 
+                if ((!postViewModel.isloading.value))
+                    SwipeRefresh(state = swipeRefreshState, onRefresh = { postViewModel.getHomePage() }) {
 
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxSize()
+if(page=="HOME")
+                        AudioBookContents(navController ,postViewModel)
+else if(page=="SHOP")
+    Text(text = "SETTINGS")
+//    ShopContents()
 
-            ) {
-                if (postViewModel.audioBookList.isNotEmpty())
-                    Column() {
-
-                        Text(text = "Genre")
-                        Box(
-                            modifier = Modifier
-
-
-                                .fillMaxWidth()
-                                .size(300.dp, 200.dp)
-
-                        ) {
-                            LazyHorizontalGrid(
-
-                                GridCells.Fixed(1),
-
-                                contentPadding = PaddingValues(
-                                    start = 12.dp,
-                                    top = 16.dp,
-                                    end = 12.dp,
-                                    bottom = 16.dp
-                                ),
-                                content = {
-                                    if (postViewModel.audioBookList.isNotEmpty())
-                                        postViewModel.audioBookList[2].items?.let {
-                                            items(it.size) { index ->
-                                                Card(
-
-                                                    modifier = Modifier
-                                                        .padding(4.dp)
-//                                                  .fillMaxHeight()
-                                                        .size(100.dp, 100.dp)
-                                                        .clickable {
-                                                            navController.navigate("test")
-                                                            Log.d(
-                                                                "TAG",
-                                                                "MainContent:${
-                                                                    postViewModel.audioBookList[2].items?.get(
-                                                                        index
-                                                                    )?.redirect_link
-                                                                } "
-                                                            )
-//                                                            navController.navigate(route = "test")
-                                                        },
-
-                                                    ) {
-                                                    postViewModel.audioBookList[2].items?.get(index)
-                                                        ?.let { it1 ->
-                                                            Column(
-                                                                Modifier
-                                                                    .padding(4.dp),
-                                                                horizontalAlignment = Alignment.CenterHorizontally,
-                                                            ) {
-                                                                it1.logo?.let { it2 ->
-                                                                    CircularAvatar(
-                                                                        imageUrl = it2,
-                                                                        size = 100.dp
-                                                                    )
-                                                                }
-                                                                it1.title?.let { it2 -> Text(text = it2,) }
-                                                            }
-                                                        }
-                                                }
-                                            }
-                                        }
-
-                                }
-                            )
-                        }
-                        postViewModel.audioBookList.forEach { audioBook ->
-
-                            audioBook.let {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth()
-
-                                ) {
-                                    it?.let { it1 ->
-
-                                        Column(
-
-                                        ) {  it1.name?.let { name ->
-
-                                              Text(text = name)
-
-                                            Row(
-
-                                            ) {
-                                                it1.items?.forEach { a->
-                                                   Column(
-                                                       modifier = Modifier.clickable {
-//                                                           a.redirect_link?.let { it2 ->
-//                                                               postViewModel.getApi(
-//                                                                   it2
-//                                                               )
-//                                                           };
-                                                        val   url= URLEncoder.encode("${a.redirect_link}", StandardCharsets.UTF_8.toString())
-                                                           navController.navigate("details/$url")
-//                                                           a.redirect_link?.let { a->  navController.navigate("grid_detail/$a" ) }
-//                                                           a.redirect_link?.let { it2 ->
-//                                                               navController.navigate("details/{$it2}" )
-//                                                           }
-                                                           Log.d(
-                                                               "TAG",
-                                                               "MainContent:${a.redirect_link.toString()} "
-                                                           ) }
-                                                   ) {
-                                                       a.logo?.let { it2 -> CircularAvatar(imageUrl= it2, size = 100.dp) }
-                                                       a.background?.let { it2 -> CircularAvatar(imageUrl= it2, size = 100.dp) }
-                                                       a.name?.let { it2 -> Text(text=it2)
-                                                           a.contentProvider?.let { b-> b.name?.let { it3 -> Text(text= it3) } }
-                                                       }
-                                                       a.title?.let { it2 -> Text(text= it2, ) }
-                                                       a.description?.let { it2 -> Text(text= it2, ) }
-                                                   }
-                                                }
-                                            }
-//
-                                        //                                            if(audioBook.slug=="banners")
-//                                                audioBook.items?.map { ab ->
-//                                                    ab.background?.let { it ->
-//                                                        Image(
-//                                                            painter = rememberAsyncImagePainter(it),
-//                                                            contentDescription = null,
-//                                                            modifier = Modifier.size(128.dp)
-//                                                        )
-//                                                    }
-//                                                }
-//
-//                                            }
-
-//                                        it.items?.let { it1 -> it.items.map {
-//
-//                                                audioBook ->
-//                                            audioBook?.let { it2 -> Column() {
-//                                                it2.name?.let { it3 -> Text(text = it3) }
-//                                                it2.background?.let { it3 ->      Image(
-//                                                    painter = rememberAsyncImagePainter(it3),
-//                                                    contentDescription = null,
-//                                                    modifier = Modifier.size(128.dp)
-//                                                ) }
-//                                            } }
-//                                        }
-                                        }
-//                                    }
-
-                                    }
-                                }
-                            }
+else if (page=="SETTINGS")
+      Text(text = "SETTINGS")
+                        else{
+                            Text("PROFILE")
                         }
                     }
-            }
-
-
-//}
-
-
-//        }
-//    }
         }
+    }
+
+
+}
+
+
 
     @SuppressLint("SuspiciousIndentation")
     @OptIn(ExperimentalFoundationApi::class)
@@ -268,7 +143,7 @@ fun MainContent(navController: NavController, postViewModel:PostViewModel) {
         viewModel: PostViewModel,
         onClick: () -> Unit,
         name: String,
-        modifier: Modifier = Modifier
+//        modifier: Modifier = Modifier.align(Alignment.BottomCenter)
     ) {
 
         var isRefreshing by remember { mutableStateOf(false) }
@@ -283,7 +158,7 @@ fun MainContent(navController: NavController, postViewModel:PostViewModel) {
                 Column(
                     modifier = Modifier
                         .verticalScroll(rememberScrollState())
-                        .fillMaxSize()
+
                 ) {
                     LazyVerticalGrid(columns = GridCells.Fixed(1)) {
                         item {
@@ -308,100 +183,19 @@ fun MainContent(navController: NavController, postViewModel:PostViewModel) {
                             if (message.name != "banners")
                                 Text(text = it)
 
-//                    if(message.slug== "genre")
-//                        LazyVerticalStaggeredGrid(
-//                            columns = StaggeredGridCells.Fixed(3),
-//
-//                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-//                            content = {
-//
-////
-//                                      //                                items(randomSizedPhotos) { photo ->
-////                                    AsyncImage(
-////                                        model = photo,
-////                                        contentScale = ContentScale.Crop,
-////                                        contentDescription = null,
-////                                        modifier = Modifier.fillMaxWidth().wrapContentHeight()
-////                                    )
-////                                }
-//                            },
-//                            modifier = Modifier.fillMaxSize()
-//                        )
-//                    else
-//                   Row(modifier = Modifier
-//                       .horizontalScroll(rememberScrollState())
-//                   ) {
-//                       message.items?.forEach {
-//                               audioBook ->
-//
-//                           audioBook.let {it ->
-//                               Column(
-//                                   modifier = Modifier.width(128.dp)
-//                               ) {
-//                                   Image(
-//                                       painter = rememberAsyncImagePainter(it.logo),
-//                                       contentDescription = null,
-//                                       modifier = Modifier.size(128.dp)
-//                                   )
-//                                   it.name?.let { it1 -> Text(text = "Name:$it1") }
-//                                   it.prices?.let { it1 -> Text(text = "Price:$it1") }
-//                                   it.genre?.let { it1 -> Text(text = "Price:$it1") }
-//                                   it.contentProvider?.let { abc -> Text(text = "Price:${abc.name}") }
-//                               }
-//
-//                           }
-//
-//                   }
-//                }}
-//            }
-//          Text(
-//              text = "Hello $name!"+viewModel.audiobookvalue.value,
-//              modifier = modifier
-//                  .clickable(
-//                      onClick = onClick
-//                  )
-//                  .padding(end = 10.dp))
-//
-//          CircularProgressIndicator(
-//              modifier = Modifier.size(48.dp),
-//              color = Color.Blue, // Optional: customize the color
-//              strokeWidth = 4.dp, // Optional: customize the stroke width
-//
-//
-//          )
                         }
                     }
-//                else
-//        SwipeRefresh(state =swipeRefreshState , onRefresh = { /*TODO*/
-//        viewModel.getPosts()
-//        }) {
-//
-//
-//           LazyColumn(
-//
-//         ) {
-//
-//
-//
-//           items(viewModel.items.size) { item ->
-//               ListItem(post = viewModel.items[item], onClick = onClick)
-//           }
-//       }
-//        }
 
-//    Text(
-//        text = "Hello $name!"+viewModel.text.value,
-//        modifier = modifier.clickable (
-//            onClick=onClick
-//        ),
                 }
             }
-    }
+
+
+
+
 
     @Composable
     fun ListPost(post: Post, onClick: () -> Unit) {
         // Compose your list item UI here
-
         Row(
 
             verticalAlignment = Alignment.CenterVertically,
@@ -409,7 +203,7 @@ fun MainContent(navController: NavController, postViewModel:PostViewModel) {
                 .padding(10.dp)
                 .clickable {
                     onClick()
-                }
+                },    horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
             CircularAvatar(
@@ -440,23 +234,249 @@ fun CircularAvatar(imageUrl: String, size: Dp) {
         modifier = Modifier
             .size(size)
 //            .clip(CircleShape)
-    , contentScale = ContentScale.FillHeight
+    , contentScale = ContentScale.FillBounds
     )
 }
-//private suspend fun performRefreshAction() {
-//    // Simulate refresh action delay
-//    kotlinx.coroutines.delay(2000)
-//    // Perform actual refresh action here
-//}
-//@Composable
-//fun Scaffold(
-//    modifier: Modifier = Modifier,
-//    topBar: @Composable () -> Unit = {},
-//    bottomBar: @Composable () -> Unit = {},
-//    snackbarHost: @Composable () -> Unit = {},
-//    floatingActionButton: @Composable () -> Unit = {},
-//    containerColor: Color = MaterialTheme.colorScheme.background,
-//    contentColor: Color = contentColorFor(containerColor),
-//    content: @Composable (PaddingValues) -> Unit
-//) {
-//}
+
+
+@Composable
+fun GroupTitle(navController: NavController,it1:AudioBookList){
+    it1.name?.let { Text(text = it) }
+    Text(text = "View All", modifier = Modifier.clickable {
+        if(it1.name=="Genre")
+            navController.navigate("album-detail")
+        else
+        navController.navigate("view_all/${it1.slug}")
+        Log.d("TAG", "MainContent: ${it1.next_page_url}")
+    })
+}
+
+@Composable
+fun BottonNav(navController: NavController,postViewModel: PostViewModel){
+    var ctx = LocalContext.current.applicationContext
+val activePage=postViewModel.activePage.value
+    Box(
+
+  ) {
+      Row(
+          modifier= Modifier
+              .fillMaxWidth()
+              .size(60.dp)
+              .background(color = Color.White, shape = RoundedCornerShape(4.dp)),  horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically
+      ) {
+          BottomNavItem(postViewModel,"HOME")
+          BottomNavItem(postViewModel,"SHOP")
+          BottomNavItem(postViewModel,"SETTINGS")
+          BottomNavItem(postViewModel,"PROFILE")
+      }
+  }
+}
+
+@Composable
+fun BottomNavItem(viewModel:PostViewModel,title:String){
+    if(viewModel.activePage.value==title )
+        Text(text = title, color = Color.Black,)
+    else
+        Text(text = title, color = Color.Gray,  modifier = Modifier.clickable {
+            viewModel.activePage.value=title
+        })
+}
+
+
+@Composable
+fun AudioBookContents(
+    navController: NavController,postViewModel:PostViewModel
+){
+    Column(
+
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+
+
+    ) {
+        if (postViewModel.audioBookList.isNotEmpty())
+            Column() {
+
+                Text(text = "Genre")
+                Box(
+                    modifier = Modifier
+
+
+                        .fillMaxWidth()
+                        .size(300.dp, 200.dp)
+
+                ) {
+                    LazyHorizontalGrid(
+
+                        GridCells.Fixed(1),
+
+                        contentPadding = PaddingValues(
+                            start = 12.dp,
+                            top = 16.dp,
+                            end = 12.dp,
+                            bottom = 16.dp
+                        ),
+                        content = {
+                            if (postViewModel.audioBookList.isNotEmpty())
+                                postViewModel.audioBookList[2].items?.let {
+                                    items(it.size) { index ->
+                                        Card(
+
+                                            modifier = Modifier
+                                                .padding(4.dp)
+//                                                  .fillMaxHeight()
+                                                .size(100.dp, 100.dp)
+                                                .clickable {
+                                                    navController.navigate("test")
+                                                    Log.d(
+                                                        "TAG",
+                                                        "MainContent:${
+                                                            postViewModel.audioBookList[2].items?.get(
+                                                                index
+                                                            )?.redirect_link
+                                                        } "
+                                                    )
+//                                                            navController.navigate(route = "test")
+                                                },
+
+                                            ) {
+                                            postViewModel.audioBookList[2].items?.get(index)
+                                                ?.let { it1 ->
+                                                    Column(
+                                                        Modifier
+                                                            .padding(4.dp),
+                                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                                    ) {
+                                                        it1.logo?.let { it2 ->
+                                                            CircularAvatar(
+                                                                imageUrl = it2,
+                                                                size = 100.dp
+                                                            )
+                                                        }
+                                                        it1.title?.let { it2 -> Text(text = it2,) }
+                                                    }
+                                                }
+                                        }
+                                    }
+                                }
+
+                        }
+                    )
+                }
+                postViewModel.audioBookList.forEach { audioBook ->
+
+                    audioBook.let {
+                        Column(
+                            modifier = Modifier.fillMaxWidth()
+
+                        ) {
+
+                            it?.let { it1 ->
+                                it1.name?.let { name ->
+                                    if(name=="Banners")
+                                        Column( modifier = Modifier
+
+
+                                            .fillMaxWidth()
+                                            .size(300.dp, 200.dp)) {
+//                                                    HorizontalPager(pageCount = 10) { page ->
+//                                                        // Our page content
+//                                                        Text(
+//                                                            text = "Page: $page",
+//                                                            modifier = Modifier.fillMaxWidth()
+//                                                        )
+//                                                    }
+
+                                            LazyHorizontalGrid(
+
+                                                GridCells.Fixed(1),
+
+                                                contentPadding = PaddingValues(
+                                                    start = 12.dp,
+                                                    top = 16.dp,
+                                                    end = 12.dp,
+                                                    bottom = 16.dp
+                                                ),
+                                                content = {
+                                                    it1.items?.let {
+                                                        items(it.size) { index ->
+                                                            it1.items[index].logo?.let { it2 ->
+                                                                CircularAvatar(
+                                                                    imageUrl = it2,
+                                                                    size =300.dp
+                                                                )
+                                                            }
+                                                        }}
+                                                })
+                                        }
+                                    else
+                                        Column(
+
+                                        ) {
+                                            Row(
+                                                modifier=Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween
+                                            ) {
+
+                                                GroupTitle(navController ,it1)
+                                            }
+
+                                            Row(
+                                                modifier = Modifier
+                                                    .horizontalScroll(rememberScrollState())
+                                                    .fillMaxSize()
+                                            ) {
+                                                it1.items?.forEach { a->
+                                                    Column(
+                                                        modifier = Modifier
+                                                            .size(300.dp, 200.dp)
+                                                            .clickable {
+//                                                           a.redirect_link?.let { it2 ->
+//                                                               postViewModel.getApi(
+//                                                                   it2
+//                                                               )
+//                                                           };
+                                                                val url = URLEncoder.encode(
+                                                                    "${a.redirect_link}",
+                                                                    StandardCharsets.UTF_8.toString()
+                                                                )
+
+                                                                navController.navigate("details/$url")
+//                                                           a.redirect_link?.let { a->  navController.navigate("grid_detail/$a" ) }
+//                                                           a.redirect_link?.let { it2 ->
+//                                                               navController.navigate("details/{$it2}" )
+//                                                           }
+                                                                Log.d(
+                                                                    "TAG",
+                                                                    "MainContent:${a.redirect_link.toString()} "
+                                                                )
+                                                            }
+                                                    ) {
+                                                        a.logo?.let { it2 -> CircularAvatar(imageUrl= it2, size = 100.dp) }
+                                                        a.background?.let { it2 -> CircularAvatar(imageUrl= it2, size = 100.dp) }
+                                                        a.name?.let { it2 -> Text(text=it2)
+                                                            a.contentProvider?.let { b-> b.name?.let { it3 -> Text(text= it3) } }
+                                                        }
+                                                        a.title?.let { it2 -> Text(text= it2, ) }
+                                                        a.description?.let { it2 -> Text(text= it2, ) }
+                                                    }
+                                                }
+                                            }
+
+                                        }
+
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+    }
+
+
+}
+

@@ -15,6 +15,8 @@ interface MomoService {
     @GET
     suspend fun getApi(@Url url: String?):GenereData
 
+
+
 }
 
 
@@ -43,7 +45,7 @@ data class AudioBookResponse (
     val totalItems: Long? = null,
     val perPageItems: Long? = null,
     val prevPageURL: String? = null,
-    val nextPageURL: String? = null,
+    val next_page_url: String? = null,
     val totalPage: Long? = null
 )
 
@@ -54,7 +56,7 @@ data class PageResponse (
     val totalItems: Long? = null,
     val perPageItems: Long? = null,
     val prevPageURL: String? = null,
-    val nextPageURL: String? = null,
+    val next_page_url: String? = null,
     val totalPage: Long? = null
 )
 
@@ -63,9 +65,9 @@ data class AudioBookList (
     val slug: String? = null,
     val items: List<AudioBook>? = null,
     val totalItems: Long? = null,
-    val perPageItems: Long? = null,
-    val prevPageURL: String? = null,
-    val nextPageURL: String? = null,
+    val per_page_items: Long? = null,
+    val prev_page_url: String? = null,
+    val next_page_url: String? = null,
     val totalPage: Long? = null
 )
 
